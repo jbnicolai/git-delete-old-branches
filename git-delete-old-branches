@@ -1,0 +1,17 @@
+#/bin/bash
+# vim: set filetype=sh :
+set -e
+set -o pipefail
+
+# will checkout master, remove local references to remote branches,
+# and remove local branches if they no longer exist on the remote
+# git branch -d will prevent unmerged branches to be removed
+
+pushd "$(git rev-parse --show-toplevel)"
+git checkout master
+
+git remote prune origin
+git branch -vv | grep ': gone' | awk '{print $1}' | xargs git branch -d
+
+git checkout - >/dev/null
+popd
